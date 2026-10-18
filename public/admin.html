@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin | TechPulse</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"></head><body>
+<div id="nav"></div>
+
+<header class="site-header"><div class="container"><h1 class="display-6">Admin Dashboard</h1><p class="mb-0">Manage articles, comments and reader records.</p></div></header>
+<main class="container mt-4"><div id="msg"></div>
+<div class="row g-3 mb-4" id="stats"></div>
+<ul class="nav nav-tabs mb-3" role="tablist"><li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#t1">Articles</button></li>
+<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t2">Comments</button></li>
+<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t3">Readers</button></li>
+<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t5">Announcements</button></li>
+<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#t4">Excel reports</button></li></ul>
+<div class="tab-content">
+<div class="tab-pane show active" id="t1"><div class="panel mb-4"><h2 class="h6" id="ft">Add new article</h2>
+ <form id="pf" class="row g-3"><input type="hidden" id="pid"><div class="col-md-8"><label class="form-label" for="title">Title *</label><input id="title" class="form-control" required></div>
+ <div class="col-md-4"><label class="form-label" for="category">Category *</label><select id="category" class="form-select"><option>Artificial Intelligence</option><option>Machine Learning</option><option>Cloud Computing</option><option>Internet of Things</option><option>Blockchain</option><option>Cybersecurity</option><option>Big Data</option><option>Web 3.0</option><option>Quantum Computing</option><option>Generative AI</option></select></div>
+ <div class="col-12"><label class="form-label" for="excerpt">Short summary *</label><input id="excerpt" class="form-control" required></div>
+ <div class="col-12"><label class="form-label" for="content">Content * <span class="text-muted small">(start a line with ## for a heading)</span></label><textarea id="content" rows="6" class="form-control" required></textarea></div>
+ <div class="col-md-8"><label class="form-label" for="tags">Tags (comma separated)</label><input id="tags" class="form-control"></div>
+ <div class="col-md-4"><label class="form-label" for="readMinutes">Read time (min)</label><input id="readMinutes" type="number" min="1" value="4" class="form-control"></div>
+ <div class="col-12"><button class="btn btn-teal">Save article</button> <button type="button" class="btn btn-secondary d-none" id="pc">Cancel edit</button></div></form></div>
+ <div class="panel table-responsive"><h2 class="h6">All articles</h2><table class="table align-middle"><thead><tr><th>Title</th><th>Category</th><th>Views</th><th>Actions</th></tr></thead><tbody id="pt"></tbody></table></div></div>
+<div class="tab-pane" id="t2"><div class="panel table-responsive"><h2 class="h6">Comment moderation</h2><table class="table align-middle"><thead><tr><th>Reader</th><th>Article</th><th>Comment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ct"></tbody></table></div></div>
+<div class="tab-pane" id="t3"><div class="panel table-responsive"><h2 class="h6">Registered readers</h2><table class="table"><thead><tr><th>Name</th><th>Enrollment</th><th>Email</th><th>Department</th><th>Sem</th><th>Actions</th></tr></thead><tbody id="rt"></tbody></table></div></div>
+<div class="tab-pane" id="t5"><div class="panel mb-4"><h2 class="h6" id="aft">Create announcement</h2>
+ <form id="af" class="row g-3"><input type="hidden" id="aid"><div class="col-md-8"><label class="form-label" for="ant">Announcement title *</label><input id="ant" class="form-control" required></div>
+ <div class="col-md-4"><label class="form-label" for="aud">Audience</label><select id="aud" class="form-select"><option>All Readers</option><option>Students</option><option>Admins</option></select></div>
+ <div class="col-12"><label class="form-label" for="anm">Message *</label><textarea id="anm" rows="3" class="form-control" required></textarea></div>
+ <div class="col-12"><button class="btn btn-teal">Publish announcement</button> <button type="button" class="btn btn-secondary d-none" id="ac">Cancel edit</button></div></form></div>
+ <div class="panel"><div class="d-flex justify-content-between"><h2 class="h6">Published announcements</h2><button class="btn btn-sm btn-outline-primary" onclick="loadA()">Refresh</button></div><div id="alist"></div></div></div>
+<div class="tab-pane" id="t4"><div class="panel"><h2 class="h6">Download records in Excel format</h2><button class="btn btn-success me-2 mb-2" onclick="xl('readers')"><i class="bi bi-file-earmark-excel"></i> Readers</button><button class="btn btn-success me-2 mb-2" onclick="xl('posts')"><i class="bi bi-file-earmark-excel"></i> Articles</button><button class="btn btn-success mb-2" onclick="xl('comments')"><i class="bi bi-file-earmark-excel"></i> Comments</button> <button class="btn btn-success mb-2" onclick="xl('announcements')"><i class="bi bi-file-earmark-excel"></i> Announcements</button></div></div>
+</div></main>
+<div id="foot"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+<script>const u=guard('admin');renderNav('dash');renderFooter();
+const xl=t=>location.href='/api/admin/export/'+t+'?token='+token();
+const ok=m=>alertBox(msg,m),bad=m=>alertBox(msg,m,'danger');let posts=[];
+async function stats(){const s=await api('/admin/stats');const S=(i,n,l)=>`<div class="col-6 col-lg"><div class="stat"><i class="bi ${i}"></i><div><b>${n}</b>${l}</div></div></div>`;
+ stats_el.innerHTML=S('bi-people',s.readers,'Readers')+S('bi-journal-text',s.posts,'Articles')+S('bi-chat-dots',s.comments,'Comments')+S('bi-hourglass-split',s.pending,'Pending comments')+S('bi-eye',s.views,'Total views')}
+const stats_el=document.getElementById('stats');
+async function loadP(){posts=await api('/posts');pt.innerHTML=posts.map(p=>`<tr><td>${esc(p.title)}</td><td>${esc(p.category)}</td><td>${p.views}</td><td><button class="btn btn-sm btn-outline-primary" onclick="editP('${p._id}')">Edit</button> <button class="btn btn-sm btn-outline-danger" onclick="delP('${p._id}')">Delete</button></td></tr>`).join('')}
+async function editP(id){const p=await api('/posts/'+id);pid.value=id;['title','category','excerpt','content','readMinutes'].forEach(k=>document.getElementById(k).value=p[k]);tags.value=p.tags.join(', ');ft.textContent='Edit article';pc.classList.remove('d-none');scrollTo(0,0)}
+pc.onclick=()=>{pf.reset();pid.value='';ft.textContent='Add new article';pc.classList.add('d-none')};
+async function delP(id){if(!confirm('Delete this article and its comments?'))return;await api('/admin/posts/'+id,'DELETE');ok('Article deleted.');loadP();stats()}
+pf.onsubmit=async e=>{e.preventDefault();const b={};['title','category','excerpt','content','tags','readMinutes'].forEach(k=>b[k]=document.getElementById(k).value);
+ try{pid.value?await api('/admin/posts/'+pid.value,'PUT',b):await api('/admin/posts','POST',b);ok('Article saved.');pc.onclick();loadP();stats()}catch(x){bad(x.message)}};
+const bc={approved:'success',pending:'warning',rejected:'danger'};
+async function loadC(){const c=await api('/admin/comments');ct.innerHTML=c.map(x=>`<tr><td>${esc(x.userName)}</td><td>${esc(x.post?x.post.title:'-')}</td><td>${esc(x.text)}</td><td><span class="badge text-bg-${bc[x.status]}">${x.status}</span></td>
+ <td class="text-nowrap">${x.status==='pending'?`<button class="btn btn-sm btn-success" onclick="setC('${x._id}','approved')">Approve</button> <button class="btn btn-sm btn-outline-danger" onclick="setC('${x._id}','rejected')">Reject</button>`:`<button class="btn btn-sm btn-outline-secondary" onclick="delC('${x._id}')">Delete</button>`}</td></tr>`).join('')||'<tr><td colspan="5" class="text-muted">No comments yet.</td></tr>'}
+async function setC(id,s){if(!confirm('Are you sure you want to mark this comment as '+s+'?'))return;await api('/admin/comments/'+id,'PUT',{status:s});loadC();stats()}
+async function delC(id){if(!confirm('Delete this comment?'))return;await api('/admin/comments/'+id,'DELETE');loadC();stats()}
+async function loadR(){const r=await api('/admin/readers');rt.innerHTML=r.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.enrollment||'-')}</td><td>${esc(x.email)}</td><td>${esc(x.department||'-')}</td><td>${esc(x.semester||'-')}</td><td><button class="btn btn-sm btn-outline-danger" onclick="delR('${x._id}')">Delete</button></td></tr>`).join('')||'<tr><td colspan="6" class="text-muted">No readers registered.</td></tr>'}
+async function delR(id){if(!confirm('Delete this reader and all their comments?'))return;try{await api('/admin/readers/'+id,'DELETE');ok('Reader deleted.');loadR();loadC();stats()}catch(x){bad(x.message)}}
+let anns=[];
+async function loadA(){anns=await api('/announcements');alist.innerHTML=anns.map(a=>`<div class="border rounded p-3 mt-3 d-flex justify-content-between gap-2"><div><b>${esc(a.title)}</b><div>${esc(a.message)}</div><div class="meta">Audience: ${esc(a.audience)} &middot; ${fmt(a.createdAt)}</div></div><div class="text-nowrap"><button class="btn btn-sm btn-outline-primary" onclick="editA('${a._id}')">Edit</button> <button class="btn btn-sm btn-outline-danger" onclick="delA('${a._id}')">Delete</button></div></div>`).join('')||'<p class="text-muted mt-3 mb-0">No announcements yet.</p>'}
+function editA(id){const a=anns.find(x=>x._id===id);aid.value=id;ant.value=a.title;anm.value=a.message;aud.value=a.audience;aft.textContent='Edit announcement';ac.classList.remove('d-none');scrollTo(0,0)}
+ac.onclick=()=>{af.reset();aid.value='';aft.textContent='Create announcement';ac.classList.add('d-none')};
+async function delA(id){if(!confirm('Delete this announcement?'))return;await api('/admin/announcements/'+id,'DELETE');ok('Announcement deleted.');loadA()}
+af.onsubmit=async e=>{e.preventDefault();const b={title:ant.value,message:anm.value,audience:aud.value};
+ try{aid.value?await api('/admin/announcements/'+aid.value,'PUT',b):await api('/admin/announcements','POST',b);ok('Announcement published.');ac.onclick();loadA()}catch(x){bad(x.message)}};
+if(u)Promise.all([stats(),loadP(),loadC(),loadR(),loadA()]).catch(e=>bad(e.message));</script></body></html>

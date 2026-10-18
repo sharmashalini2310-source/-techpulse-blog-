@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile | TechPulse</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"></head><body>
+<div id="nav"></div>
+
+<main class="container"><div class="panel auth-card w-100"><div class="text-center mb-3"><div class="rounded-circle bg-info-subtle d-inline-flex align-items-center justify-content-center fs-2 fw-bold text-primary" style="width:70px;height:70px" id="av">?</div><h2 class="h5 mt-2" id="pn"></h2><p class="text-muted small">Your TechPulse account details</p></div>
+<div id="msg"></div><div id="view"></div>
+<form id="f" class="row g-3 d-none"><div class="col-sm-6"><label class="form-label" for="name">Full name</label><input id="name" class="form-control" required></div>
+<div class="col-sm-6"><label class="form-label" for="email">Email</label><input id="email" type="email" class="form-control" required></div>
+<div class="col-sm-6"><label class="form-label" for="mobile">Mobile</label><input id="mobile" class="form-control"></div>
+<div class="col-sm-6"><label class="form-label" for="department">Department</label><input id="department" class="form-control"></div>
+<div class="col-sm-6"><label class="form-label" for="semester">Semester</label><select id="semester" class="form-select"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+<div class="col-12"><button class="btn btn-success">Save changes</button> <button type="button" class="btn btn-secondary" id="cancel">Cancel</button></div></form></div></main>
+<div id="foot"></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+<script>guard();renderNav('dash');renderFooter();let me;
+const rows=m=>[['Full name',m.name],['Enrollment number',m.enrollment||'-'],['Email',m.email],['Mobile',m.mobile||'-'],['Department',m.department||'-'],['Semester',m.semester||'-'],['Account role',m.role]];
+function show(){av.textContent=me.name[0].toUpperCase();pn.textContent=me.name;
+ view.innerHTML='<button class="btn btn-primary btn-sm mb-3" id="eb">Edit profile</button><div class="row g-2">'+rows(me).map(r=>`<div class="col-sm-6"><div class="border rounded p-2 small"><span class="text-muted">${r[0]}</span><br><b>${esc(r[1])}</b></div></div>`).join('')+'</div>';
+ document.getElementById('eb').onclick=()=>{['name','email','mobile','department','semester'].forEach(k=>document.getElementById(k).value=me[k]||'');view.classList.add('d-none');f.classList.remove('d-none')}}
+cancel.onclick=()=>{f.classList.add('d-none');view.classList.remove('d-none')};
+api('/me').then(m=>{me=m;show()}).catch(()=>logout());
+f.onsubmit=async e=>{e.preventDefault();try{const b={};['name','email','mobile','department','semester'].forEach(k=>b[k]=document.getElementById(k).value);
+ const r=await api('/me','PUT',b);me=r.user;localStorage.setItem('tp_user',JSON.stringify(me));alertBox(msg,r.message);cancel.onclick();show()}catch(x){alertBox(msg,x.message,'danger')}};</script></body></html>

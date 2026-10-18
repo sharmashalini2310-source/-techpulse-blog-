@@ -1,0 +1,42 @@
+require('dotenv').config();
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const { User, Post, Comment, Announcement } = require('./server');
+
+const posts = [
+ ['Artificial Intelligence: Machines That Reason','Artificial Intelligence','AI systems perform tasks that normally need human intelligence, from recognising faces to planning routes.',
+  'Artificial Intelligence (AI) is the branch of computer science that builds systems able to perceive, reason, learn and act.\n\n## Where AI is used today\nSearch engines rank results with AI, banks detect fraud with it, hospitals read scans with it, and phones transcribe speech with it.\n\n## Key ideas\nAI covers rule-based expert systems, search and planning, machine learning and natural language processing. Modern AI is mostly data-driven: a model is trained on examples and then makes predictions on new inputs.\n\n## Challenges\nBias in data, lack of explainability and energy use are active research problems.', ['ai','automation','future'],5],
+ ['Machine Learning Explained for Beginners','Machine Learning','Machine Learning lets software improve from data instead of following hand-written rules.',
+  'Machine Learning (ML) is a subset of AI where algorithms find patterns in data and use them to predict or decide.\n\n## Three main types\nSupervised learning uses labelled data (spam or not spam). Unsupervised learning finds structure in unlabelled data (customer groups). Reinforcement learning learns by reward and penalty (game-playing agents).\n\n## A typical workflow\nCollect data, clean it, choose a model, train, evaluate on unseen data, then deploy and monitor. Popular tools include Python, scikit-learn, TensorFlow and PyTorch.', ['ml','python','data'],5],
+ ['Cloud Computing: Renting the Data Centre','Cloud Computing','Cloud platforms give on-demand servers, storage and databases over the internet with pay-as-you-go pricing.',
+  'Cloud computing delivers computing resources over the internet so teams do not need to buy and maintain physical servers.\n\n## Service models\nIaaS gives virtual machines and networks, PaaS gives a ready platform for deploying code, and SaaS gives finished applications such as email or office suites.\n\n## Why teams adopt it\nElastic scaling, global reach, built-in backups and lower upfront cost. Major providers include AWS, Microsoft Azure and Google Cloud. Students can deploy a Node.js app to a free tier in minutes.', ['cloud','devops','aws'],4],
+ ['Internet of Things: A World of Connected Devices','Internet of Things','IoT connects sensors and appliances to the internet so they can collect data and be controlled remotely.',
+  'The Internet of Things (IoT) is a network of physical objects fitted with sensors, software and connectivity.\n\n## Examples\nSmart thermostats, fitness bands, soil-moisture sensors in farms, and tracking devices in logistics.\n\n## How it works\nA sensor reads data, a microcontroller such as ESP32 sends it using Wi-Fi or MQTT, a cloud service stores it, and a dashboard shows it. Security is critical: weak default passwords on devices are a common attack path.', ['iot','sensors','embedded'],4],
+ ['Blockchain Beyond Cryptocurrency','Blockchain','A blockchain is a shared ledger where records are linked by hashes and cannot be quietly changed.',
+  'A blockchain stores data in blocks. Each block contains a cryptographic hash of the previous block, so altering old data breaks the chain.\n\n## Consensus\nNodes agree on new blocks using mechanisms such as Proof of Work or Proof of Stake, removing the need for a central authority.\n\n## Uses\nBesides digital currency, blockchains support supply-chain tracking, certificate verification and smart contracts, which are programs that run automatically when conditions are met.', ['blockchain','web3','security'],4],
+ ['Cybersecurity Essentials for Developers','Cybersecurity','Secure coding habits such as hashing passwords and validating input stop most common attacks.',
+  'Cybersecurity protects systems, networks and data from attack.\n\n## Common web threats\nSQL or NoSQL injection, cross-site scripting (XSS), broken authentication and phishing appear every year in OWASP lists.\n\n## Good habits\nHash passwords with bcrypt, never store plain text, validate and sanitise all input, use HTTPS, keep dependencies updated, and give each user only the permissions they need.', ['security','owasp','bcrypt'],5],
+ ['Big Data: Making Sense of Massive Datasets','Big Data','Big Data tools process datasets too large for one computer, revealing trends that guide decisions.',
+  'Big Data is described by the 5 Vs: volume, velocity, variety, veracity and value.\n\n## Tools\nHadoop stores data across many machines, Spark processes it quickly in memory, and Kafka streams events in real time. NoSQL databases such as MongoDB handle flexible, fast-changing data.\n\n## Impact\nRetailers predict demand, cities manage traffic and streaming services recommend what to watch next.', ['bigdata','spark','analytics'],4],
+ ['Web 3.0: The Decentralised Web','Web 3.0','Web 3.0 aims to give users ownership of data and identity using decentralised technology and smarter semantics.',
+  'Web 1.0 was read-only, Web 2.0 added social and user-generated content, and Web 3.0 proposes a user-owned web.\n\n## Building blocks\nBlockchain, decentralised apps (dApps), digital wallets for identity and the semantic web, where data carries meaning machines can understand.\n\n## Open questions\nScalability, usability and regulation are still being solved, so developers should treat Web 3.0 as an evolving field.', ['web3','dapps','semantic-web'],4],
+ ['Quantum Computing: A New Way to Compute','Quantum Computing','Quantum computers use qubits and can solve certain problems far faster than classical machines.',
+  'Classical bits are 0 or 1. Qubits can exist in superposition and can be entangled, which lets quantum algorithms explore many possibilities together.\n\n## Promising areas\nSimulating molecules, optimisation problems and breaking some current encryption, which is why post-quantum cryptography is being standardised.\n\n## Today\nHardware is noisy and small, so quantum machines complement rather than replace classical computers. Cloud access lets students experiment with simulators.', ['quantum','qubits','research'],5],
+ ['Generative AI and Large Language Models','Generative AI','Generative AI creates new text, images, audio and code by learning patterns from huge training sets.',
+  'Generative AI models produce new content instead of only classifying existing data. Large Language Models (LLMs) are trained on large text collections to predict the next token, which enables chat, summarising and coding help.\n\n## For web developers\nLLM APIs can add chat assistants, smart search and content drafting to a website. Always check generated output, protect user data and respect copyright.\n\n## Responsible use\nHallucinations, bias and misuse are real risks, so human review remains essential.', ['genai','llm','prompting'],5]
+].map(([title,category,excerpt,content,tags,readMinutes])=>({title,category,excerpt,content,tags,readMinutes}));
+
+(async () => {
+  await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/techpulse');
+  await Promise.all([User.deleteMany({}), Post.deleteMany({}), Comment.deleteMany({}), Announcement.deleteMany({})]);
+  await User.create({ name: 'TechPulse Admin', email: 'admin@techpulse.com', password: await bcrypt.hash('Admin@123', 10), role: 'admin' });
+  await User.create({ name: 'Test Reader', enrollment: '240490131001', email: 'reader@techpulse.com', mobile: '9876543210', department: 'Information Technology', semester: '5', password: await bcrypt.hash('Reader@123', 10) });
+  await Post.insertMany(posts);
+  await Announcement.insertMany([
+    { title: 'Welcome to TechPulse', message: 'New articles on AI, Cloud and Cybersecurity are now live. Start reading today.', audience: 'All Readers' },
+    { title: 'Comment moderation', message: 'All comments are reviewed by an administrator before they appear on an article.', audience: 'All Readers' },
+    { title: 'Quantum Computing series', message: 'A new article on Quantum Computing has been published. Save it to read later.', audience: 'Students' }
+  ]);
+  console.log('Seeded: 10 articles, admin (admin@techpulse.com / Admin@123), reader (reader@techpulse.com / Reader@123)');
+  process.exit(0);
+})();
